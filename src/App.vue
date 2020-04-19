@@ -10,19 +10,12 @@
 export default {
   name: 'App',
 
-  components: {
-  },
-
-  data: () => ({
-    //
-  }),
-
   watch: {
     $route: {
       immediate: true,
       handler(to, from) {
         document.title = `Beslisser - ${to.meta.title}` || 'Beslisser'
-        this.$router.push('/authentication')
+        // this.$router.push('/authentication')
       }
     }
   }
