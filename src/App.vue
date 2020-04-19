@@ -56,5 +56,14 @@ export default {
   data: () => ({
     //
   }),
+
+  watch: {
+    $route: {
+      immediate: true,
+      handler(to, from) {
+        document.title = to.meta.title || 'Beslisser'
+      }
+    }
+  }
 };
 </script>
