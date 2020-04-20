@@ -125,7 +125,8 @@
 </template>
 
 <script>
-  import { mapActions } from 'vuex';
+  import { mapActions, mapGetters } from 'vuex'
+  import service from '../helpers/service'
 
   export default {
     name: "Authentication",
@@ -166,6 +167,9 @@
       }
     }),
     computed: {
+      ...mapGetters({
+        isAuthenticated: 'getAuthState'
+      }),
       verifyPasswordRule () {
         let password = this.forms.registerForm.password;
         let rePassword = this.forms.registerForm.passwordVerify;
@@ -177,7 +181,8 @@
     },
     methods: {
       ...mapActions ({
-        authenticate: 'authenticateUser'
+        setAuthentication: 'setAuthentication',
+        setUser: 'setUser',
       }),
       year () {
         let date = new Date();
@@ -199,7 +204,27 @@
             email: this.forms.loginForm.email,
             password: this.forms.loginForm.password
           }
-          this.authenticate(data)
+          service.login(data).then(res => {
+            this.setAuthentication(res.data.access_token)
+            service.getUser().then(res => {
+              this.setUser(res.data)
+              this.$router.push('/')
+            }).catch(err => {
+              this.alert = {
+                active: true,
+                type: 'error',
+                msg: 'An error has occurred while logging in.'
+              }
+              console.log(err)
+            })
+          }).catch(err => {
+            this.alert = {
+              active: true,
+              type: 'error',
+              msg: 'Email or Password invalid.'
+            }
+            console.log(err)
+          })
         } else {
           this.alert = {
             active: true,
@@ -223,7 +248,7 @@
             msg: 'All fields cannot be blank.'
           }
         }
-      }
+      },
     }
   }
 </script>

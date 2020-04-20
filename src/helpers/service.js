@@ -2,15 +2,6 @@ import Axios from 'axios';
 import store from '../store';
 import config from './config';
 
-let token = ""
-if (localStorage.getItem('token')) {
-  token = localStorage.getItem('token')
-}
-
-const setToken = (token) => {
-  localStorage.setItem('token', token);
-}
-
 const api = Axios.create({
   baseURL: `${config.apiUri}/v0`,
   timeout: config.timeout,
@@ -18,10 +9,18 @@ const api = Axios.create({
 })
 
 api.interceptors.request.use((config) => {
-  console.log('Still loading..');
+  store.dispatch('setLoading', true);
   return config;
 }, (error) => {
-  console.log('Not loading.');
+  store.dispatch('setLoading', false)
+  return Promise.reject(error)
+})
+
+api.interceptors.response.use((response) => {
+  store.dispatch('setLoading', false);
+  return response;
+}, (error) => {
+  store.dispatch('setLoading', false);
   return Promise.reject(error)
 })
 
@@ -32,51 +31,30 @@ const postConfig = {
   }
 }
 
+const postSecuredConfig = {
+  headers: {
+    "Content-Type": "application/json;charset=UTF-8",
+    "Access-Control-Allow-Origin": "*",
+    "access_token": localStorage.getItem('token')
+  }
+}
+
 const getSecuredConfig = {
   headers: {
-    "access_token": token
+    "access_token": localStorage.getItem('token')
   }
 }
 
 // requests starts here
 const login = (data) => {
-  api.post('/user/login', data, postConfig)
-    .then(res => {
-      // return res;
-      console.log(res)
-    })
-    .catch(err => {
-      // return err;
-      console.log(err)
-    })
-}
-
-const register = (data) => {
-  api.post('/user/register', data, postConfig)
-    .then(res => {
-      console.log(res);
-      // return res;
-    })
-    .catch(err => {
-      console.log(err)
-      // return err;
-    })
+  return api.post('/user/login', data, postConfig)
 }
 
 const getUser = () => {
-  api.get('/user/me', getSecuredConfig)
-    .then(res => {
-      console.log(res);
-      // return res;
-    })
-    .catch(err => {
-      console.log(err)
-      // return err;
-    })
+  return api.get('/user/me', getSecuredConfig)
 }
 
 export default {
   login,
-  register,
   getUser
 }

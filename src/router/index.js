@@ -1,24 +1,35 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import store from '../store';
 import Home from '../views/Home.vue'
 
 Vue.use(VueRouter)
 
 const routes = [
   {
+    path: '/authentication',
+    name: 'Auth',
+    component: () => import('../views/Authentication.vue'),
+    meta: {
+      title: 'Authentication'
+    }
+  },
+  {
     path: '/',
     name: 'Home',
     component: Home,
     meta: {
-      title: 'Beslisser'
-    }
-  },
-  {
-    path: '/authentication',
-    name: 'Authentication',
-    component: () => import('../views/Authentication.vue'),
-    meta: {
-      title: 'Authentication'
+      title: 'Dashboard'
+    },
+    async beforeEnter(to, from, next) {
+      let authState = await store.getters.getAuthState
+      if (authState) {
+        next()
+      } else {
+        next({
+          name: "Auth"
+        })
+      }
     }
   },
 ]
