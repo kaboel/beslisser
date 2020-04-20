@@ -15,7 +15,7 @@
           <v-col cols="4" sm="4" class="ml-0 pl-0 fixed-height">
             <v-tabs v-model="activeTab"
                     grow>
-              <v-tab-item key="1" value="sign-in">
+              <v-tab-item key="1" value="loginForm">
                 <v-container class="px-10">
                   <span class="display-3 font-weight-thin">Sign In</span>
                   <v-form class="mt-7 px-7"
@@ -31,17 +31,20 @@
                                   v-model="forms.loginForm.password"
                                   :rules="forms.rules.passwordRules"/>
                     <div class="mt-5">
-                      <v-btn class="mr-4 primary">
+                      <v-btn class="mr-4 primary"
+                             @click="userLogin"
+                             v-on:keyup.enter="userLogin">
                         Let's go!
                       </v-btn>
                       <v-btn class="error--text"
-                             @click="$refs.loginForm.reset()">
+                             @click="resetForm('loginForm')">
                         Clear
                       </v-btn>
                     </div>
 
                     <div class="mt-10 text-right">
-                      <v-btn text @click="activeTab='register'">
+                      <v-btn text
+                             @click="switchTab('registerForm')">
                         Create account
                         <v-icon class="ml-2">mdi-arrow-right</v-icon>
                       </v-btn>
@@ -49,7 +52,7 @@
                   </v-form>
                 </v-container>
               </v-tab-item>
-              <v-tab-item key="2" value="register">
+              <v-tab-item key="2" value="registerForm">
                 <v-container class="px-10">
                   <span class="display-1 font-weight-thin">Create new account</span>
                   <v-form class="mt-5 px-7 text-center"
@@ -78,15 +81,17 @@
                                   @click:append="forms.showVerification = !forms.showVerification"/>
                     <v-row class="mt-4">
                       <v-col class="text-left">
-                        <v-btn class="mr-4 success">
+                        <v-btn class="mr-4 success"
+                               @click="userRegister">
                           Sign Up
                         </v-btn>
                         <v-btn class="error--text"
-                               @click="$refs.registerForm.reset()">
+                               @click="resetForm('registerForm')">
                           Clear
                         </v-btn>
                       </v-col>
-                      <v-col class="text-right" @click="activeTab='sign-in'">
+                      <v-col class="text-right"
+                             @click="switchTab('loginForm')">
                         <v-btn class="error">Cancel</v-btn>
                       </v-col>
                     </v-row>
@@ -94,6 +99,14 @@
                 </v-container>
               </v-tab-item>
             </v-tabs>
+            <v-alert  v-model="alert.active"
+                      :type="alert.type"
+                      class="mt-5"
+                      transition="slide-y-reverse-transition"
+                      prominent
+                      dismissible>
+              {{ alert.msg }}
+            </v-alert>
           </v-col>
         </v-row>
       </v-col>
@@ -112,10 +125,12 @@
 </template>
 
 <script>
+  import { mapActions } from 'vuex';
+
   export default {
     name: "Authentication",
     data: () => ({
-      activeTab: "sign-in",
+      activeTab: "loginForm",
       forms:  {
         loginForm: {
           isValid: false,
@@ -143,6 +158,11 @@
         },
         showPassword: false,
         showVerification: false,
+      },
+      alert: {
+        active: false,
+        type: 'info',
+        msg: ""
       }
     }),
     computed: {
@@ -156,15 +176,53 @@
       }
     },
     methods: {
+      ...mapActions ({
+        authenticate: 'authenticateUser'
+      }),
       year () {
         let date = new Date();
         return date.getFullYear();
       },
-      resetLoginForm () {
-        this.$refs.loginForm.reset();
+      resetForm(ref) {
+        this.$refs[ref].reset()
+        this.alert.active = false;
       },
-      resetRegisterForm () {
-        this.$refs.registerForm.reset();
+      switchTab (tab) {
+        let prev = this.activeTab;
+        this.resetForm(prev);
+        this.activeTab = tab;
+      },
+      userLogin () {
+        this.$refs.loginForm.validate();
+        if (this.forms.loginForm.isValid) {
+          let data = {
+            email: this.forms.loginForm.email,
+            password: this.forms.loginForm.password
+          }
+          this.authenticate(data)
+        } else {
+          this.alert = {
+            active: true,
+            type: 'warning',
+            msg: 'All fields cannot be blank.'
+          }
+        }
+      },
+      userRegister () {
+        this.$refs.registerForm.validate();
+        if (this.forms.registerForm.isValid) {
+          this.alert = {
+            active: true,
+            type: 'success',
+            msg: "Pass"
+          }
+        } else {
+          this.alert = {
+            active: true,
+            type: 'warning',
+            msg: 'All fields cannot be blank.'
+          }
+        }
       }
     }
   }

@@ -1,4 +1,5 @@
 import Axios from 'axios';
+import store from '../store';
 import config from './config';
 
 let token = ""
@@ -11,7 +12,17 @@ const setToken = (token) => {
 }
 
 const api = Axios.create({
-  baseURL: `${config.apiUri}/v0`
+  baseURL: `${config.apiUri}/v0`,
+  timeout: config.timeout,
+  params: config.params
+})
+
+api.interceptors.request.use((config) => {
+  console.log('Still loading..');
+  return config;
+}, (error) => {
+  console.log('Not loading.');
+  return Promise.reject(error)
 })
 
 const postConfig = {
