@@ -1,63 +1,73 @@
 <template>
-  <v-container fluid class="justify-center" align="center">
-    <v-row justify="center"
-           align="center"
-           class="main-container">
-      <v-col cols="12">
-        <v-row align="center" justify="center">
-          <v-col cols="2" sm="2" class="mr-0 pr-0">
-            <v-img src="../assets/logo-grad.png"/>
-          </v-col>
+  <v-container>
+    <div class="auth-area">
+      <div class="auth-window">
+        <div class="auth-sections">
+          <img class="responsive" src="../assets/logo-grad.png">
           <v-divider vertical/>
-          <span class="title">
-            Voor een optimale beslissing.
-          </span>
-          <v-col cols="4" sm="4" class="ml-0 pl-0 fixed-height">
+        </div>
+        <div class="auth-sections text-center">
+          <p class="vertical">Voor en optimale beslissing</p>
             <v-tabs v-model="activeTab"
                     grow>
               <v-tab-item key="1" value="loginForm">
-                <v-container class="px-10">
-                  <span class="display-3 font-weight-thin">Sign In</span>
-                  <v-form class="mt-7 px-7"
-                          autocomplete="off"
-                          ref="loginForm"
+                <div class="auth-form">
+                  <p class="display-3 font-weight-thin">
+                    Sign In
+                  </p>
+                  <v-form ref="loginForm"
                           v-model="forms.loginForm.isValid">
                     <v-text-field type="text"
                                   label="Email"
                                   v-model="forms.loginForm.email"
                                   :rules="forms.rules.emailRules"/>
-                    <v-text-field type="password"
+                    <v-text-field :type="forms.showPassword ? 'text' : 'password'"
                                   label="Password"
                                   v-model="forms.loginForm.password"
-                                  :rules="forms.rules.passwordRules"/>
-                    <div class="mt-5">
-                      <v-btn class="mr-4 primary"
-                             @click="userLogin"
-                             v-on:keyup.enter="userLogin">
-                        Let's go!
-                      </v-btn>
-                      <v-btn class="error--text"
-                             @click="resetForm('loginForm')">
-                        Clear
-                      </v-btn>
-                    </div>
-
-                    <div class="mt-10 text-right">
-                      <v-btn text
-                             @click="switchTab('registerForm')">
-                        Create account
-                        <v-icon class="ml-2">mdi-arrow-right</v-icon>
-                      </v-btn>
-                    </div>
+                                  :rules="forms.rules.passwordRules"
+                                  :append-icon="forms.showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                                  @click:append="forms.showPassword = !forms.showPassword"/>
+                    <v-row class="mt-2">
+                      <v-col>
+                        <v-btn class="mr-4 primary"
+                               @click="userLogin"
+                               v-on:keyup.enter="userLogin">
+                          Let's go!
+                        </v-btn>
+                        <v-btn class="error--text"
+                               @click="resetForm('loginForm')">
+                          Clear
+                        </v-btn>
+                      </v-col>
+                    </v-row>
+                    <v-row>
+                      <v-col class="text-center mt-2">
+                        <span class="subtitle-1 grey--text">Or</span>
+                        <v-btn text width="100%"
+                               @click="switchTab('registerForm')">
+                          Create account
+                          <v-icon class="ml-2">mdi-chevron-right</v-icon>
+                        </v-btn>
+                      </v-col>
+                    </v-row>
                   </v-form>
-                </v-container>
+                </div>
               </v-tab-item>
               <v-tab-item key="2" value="registerForm">
-                <v-container class="px-10">
-                  <span class="display-1 font-weight-thin">Create new account</span>
-                  <v-form class="mt-5 px-7 text-center"
-                          ref="registerForm"
-                          autocomplete="off"
+                <div class="auth-form">
+                  <v-row justify="center" align="center">
+                    <v-col>
+                      <span class="display-1 font-weight-thin">Sign Up</span>
+                    </v-col>
+                    <v-col class="text-right">
+                      <v-btn fab x-small
+                             text @click="switchTab('loginForm')"
+                             color="red">
+                        <v-icon>mdi-close</v-icon>
+                      </v-btn>
+                    </v-col>
+                  </v-row>
+                  <v-form ref="registerForm"
                           v-model="forms.registerForm.isValid">
                     <v-text-field type="text"
                                   label="Name"
@@ -67,20 +77,20 @@
                                   label="Email"
                                   v-model="forms.registerForm.email"
                                   :rules="forms.rules.emailRules"/>
-                    <v-text-field :type="forms.showPassword ? 'text' : 'password'"
+                    <v-text-field :type="forms.showNewPassword ? 'text' : 'password'"
                                   label="Password"
                                   v-model="forms.registerForm.password"
                                   :rules="forms.rules.passwordRules"
-                                  :append-icon="forms.showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-                                  @click:append="forms.showPassword = !forms.showPassword"/>
+                                  :append-icon="forms.showNewPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                                  @click:append="forms.showNewPassword = !forms.showNewPassword"/>
                     <v-text-field :type="forms.showVerification ? 'text' : 'password'"
                                   label="Verify Password"
                                   v-model="forms.registerForm.passwordVerify"
                                   :rules="verifyPasswordRule"
                                   :append-icon="forms.showVerification ? 'mdi-eye' : 'mdi-eye-off'"
                                   @click:append="forms.showVerification = !forms.showVerification"/>
-                    <v-row class="mt-4">
-                      <v-col class="text-left">
+                    <v-row class="mt-2">
+                      <v-col class="text-right">
                         <v-btn class="mr-4 success"
                                @click="userRegister">
                           Sign Up
@@ -90,37 +100,29 @@
                           Clear
                         </v-btn>
                       </v-col>
-                      <v-col class="text-right"
-                             @click="switchTab('loginForm')">
-                        <v-btn class="error">Cancel</v-btn>
-                      </v-col>
                     </v-row>
                   </v-form>
-                </v-container>
+                </div>
               </v-tab-item>
             </v-tabs>
-            <v-alert  v-model="alert.active"
-                      :type="alert.type"
-                      class="mt-5"
-                      transition="slide-y-reverse-transition"
-                      prominent
-                      dismissible>
-              {{ alert.msg }}
-            </v-alert>
-          </v-col>
-        </v-row>
-      </v-col>
-    </v-row>
-    <v-row justify="center" class="copyright">
-      <v-col cols="8" sm="8" class="text-center pb-10">
-        <span class="subtitle-1 grey--text">
-          Copyright
-          <v-icon>mdi-copyright</v-icon>
-          {{ year() }}
-          <code>_wawinkTeam</code>
-        </span>
-      </v-col>
-    </v-row>
+        </div>
+      </div>
+    </div>
+
+    <v-snackbar v-model="alert.active"
+                :color="alert.type"
+                :timeout=3000
+                multi-line
+                top right>
+      <v-icon v-if="alert.type==='warning'">mdi-alert</v-icon>
+      <v-icon v-if="alert.type==='error'">mdi-alert-circle</v-icon>
+      {{ alert.msg }}
+      <v-btn  dark text
+              small color="red"
+              @click="alert.active = false">
+        <v-icon>mdi-close</v-icon>
+      </v-btn>
+    </v-snackbar>
   </v-container>
 </template>
 
@@ -158,6 +160,7 @@
           ]
         },
         showPassword: false,
+        showNewPassword: false,
         showVerification: false,
       },
       alert: {
@@ -184,13 +187,8 @@
         setAuthentication: 'setAuthentication',
         setUser: 'setUser',
       }),
-      year () {
-        let date = new Date();
-        return date.getFullYear();
-      },
       resetForm(ref) {
         this.$refs[ref].reset()
-        this.alert.active = false;
       },
       switchTab (tab) {
         let prev = this.activeTab;
@@ -218,6 +216,7 @@
               console.log(err)
             })
           }).catch(err => {
+            this.forms.loginForm.password = ""
             this.alert = {
               active: true,
               type: 'error',
@@ -254,23 +253,48 @@
 </script>
 
 <style scoped>
+  .auth-area {
+    /*border: 1px solid black;*/
+    min-height: 89vh;
+    display: flex;
+    justify-content: center;
+    align-items: start;
+  }
+  .auth-window {
+    max-width: 1000px;
+    min-width: 1000px;
+    margin: 20px;
+    margin-top: 10%;
+    padding: 20px;
+    font-weight: 600;
+    font-size: .9rem;
+    display: flex;
+    justify-content: center;
+    /*border: 1px solid black;*/
+  }
+  .auth-sections img {
+    width: 400px;
+  }
   .v-application .title{
     font-family: 'Ubuntu', sans-serif !important;
   }
-  .main-container {
-    margin-top: 7%;
-  }
-  .title {
+  p.vertical {
+    width: 100%;
     writing-mode: vertical-lr !important;
     text-orientation: mixed !important;
+    font-size: 20px;
     color: #ddd;
   }
-  .fixed-height {
-    height: 45vh;
+  .auth-sections  {
+    display: flex;
+    align-items: center;
   }
-  .copyright {
-    position: absolute;
-    width: 100%;
-    bottom: 0;
+  .auth-form{
+    text-align: left;
+    width: 325px;
+    margin-left: 50px;
+    padding-bottom: 50px;
+
+    height: 450px;
   }
 </style>

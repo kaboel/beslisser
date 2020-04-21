@@ -22,6 +22,7 @@ const mutations = {
 
 const actions = {
   setAuthentication (context, token) {
+    localStorage.clear()
     localStorage.setItem('token', token)
   },
   setUser (context, data) {
@@ -57,9 +58,23 @@ const actions = {
         }
         context.commit('user', user);
         context.commit('authenticate', true)
+        new Promise((resolve, reject) => {
+          router.replace('/').then(res => {
+            resolve(res)
+          }).catch(err => {
+            reject(err)
+          })
+        })
       }).catch(err => {
         context.commit('user', {});
         context.commit('authenticate', false)
+        new Promise((resolve, reject) => {
+          router.replace('/authentication').then(res => {
+            resolve(res)
+          }).catch(err => {
+            reject(err)
+          })
+        })
       })
     }
   }

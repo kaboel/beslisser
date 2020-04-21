@@ -12,6 +12,16 @@ const routes = [
     component: () => import('../views/Authentication.vue'),
     meta: {
       title: 'Authentication'
+    },
+    async beforeEnter(to, from, next) {
+      let authState = await store.getters.getAuthState
+      if (!authState) {
+        next()
+      } else {
+        next({
+          name: "Home"
+        })
+      }
     }
   },
   {

@@ -4,6 +4,17 @@
       <router-view/>
     </v-content>
 
+    <v-row justify="center" class="copyright">
+      <v-col cols="8" sm="8" class="text-center pb-10">
+        <span class="subtitle-1 grey--text">
+          Copyright
+          <v-icon>mdi-copyright</v-icon>
+          {{ year() }}
+          <code>_wawinkTeam</code>
+        </span>
+      </v-col>
+    </v-row>
+
     <v-overlay :value="loadingState"
                 opacity="0.1">
       <div class="lds-ripple"><div></div><div></div></div>
@@ -42,13 +53,17 @@
     methods: {
       ...mapActions({
         checkAuth: 'checkAuth',
-      })
+      }),
+      year () {
+        let date = new Date();
+        return date.getFullYear();
+      },
     }
   };
 </script>
 
 <style lang="css">
-  * {
+  *, body, div, p, span, .display-1, .display-2, .display-3, .display-4 {
     font-family: 'Ubuntu', sans-serif !important;
   }
   .lds-ripple {
@@ -82,5 +97,10 @@
       height: 144px;
       opacity: 0;
     }
+  }
+  .copyright {
+    position: absolute;
+    width: 100%;
+    bottom: 0;
   }
 </style>
