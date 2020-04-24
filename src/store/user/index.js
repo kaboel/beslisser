@@ -21,23 +21,30 @@ const mutations = {
 }
 
 const actions = {
-  setAuthentication (context, token) {
-    localStorage.clear()
-    localStorage.setItem('token', token)
-  },
-  setUser (context, data) {
-    const user = {
-      id: data._id,
+  setLogin(context, data) {
+    let token = data.access_token;
+    let user = {
+      id: data.id,
       name: data.name,
       email: data.email
     }
+    let auth = data.auth;
+    localStorage.clear()
+    localStorage.setItem('token', token)
+    context.commit('authenticate', auth)
     context.commit('user', user);
-    context.commit('authenticate', true)
+    new Promise((resolve, reject) => {
+      router.replace('/').then(res => {
+        resolve(res)
+      }).catch(err => {
+        reject(err)
+      })
+    })
   },
   userLogout(context) {
     localStorage.clear()
-    context.commit('user', {})
     context.commit('authenticate', false)
+    context.commit('user', {})
     new Promise((resolve, reject) => {
       router.replace('/authentication').then(res => {
         resolve(res)
@@ -51,29 +58,37 @@ const actions = {
     if (token) {
       service.getUser().then(res => {
         let data = res.data
-        const user = {
-          id: data._id,
-          name: data.name,
-          email: data.email
+        if (data.auth) {
+          let user = {
+            id: data.id,
+            name: data.name,
+            email: data.email
+          }
+          context.commit('authenticate', data.auth)
+          context.commit('user', user)
+          new Promise((resolve, reject) => {
+            router.replace('/').then(res => {
+              resolve(res)
+            }).catch(err => {
+              reject(err)
+            })
+          })
+        } else {
+          new Promise((resolve, reject) => {
+            router.replace('/authentication').then(res => {
+              resolve(res)
+            }).catch(err => {
+              reject(err)
+            })
+          })
         }
-        context.commit('user', user);
-        context.commit('authenticate', true)
-        new Promise((resolve, reject) => {
-          router.replace('/').then(res => {
-            resolve(res)
-          }).catch(err => {
-            reject(err)
-          })
-        })
-      }).catch(err => {
-        context.commit('user', {});
-        context.commit('authenticate', false)
-        new Promise((resolve, reject) => {
-          router.replace('/authentication').then(res => {
-            resolve(res)
-          }).catch(err => {
-            reject(err)
-          })
+      })
+    } else {
+      new Promise((resolve, reject) => {
+        router.replace('/authentication').then(res => {
+          resolve(res)
+        }).catch(err => {
+          reject(err)
         })
       })
     }

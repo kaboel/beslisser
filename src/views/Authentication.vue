@@ -127,7 +127,7 @@
 </template>
 
 <script>
-  import { mapActions, mapGetters } from 'vuex'
+  import { mapGetters } from 'vuex'
   import service from '../helpers/service'
 
   export default {
@@ -183,10 +183,6 @@
       }
     },
     methods: {
-      ...mapActions ({
-        setAuthentication: 'setAuthentication',
-        setUser: 'setUser',
-      }),
       resetForm(ref) {
         this.$refs[ref].reset()
       },
@@ -203,24 +199,14 @@
             password: this.forms.loginForm.password
           }
           service.login(data).then(res => {
-            this.setAuthentication(res.data.access_token)
-            service.getUser().then(res => {
-              this.setUser(res.data)
-              this.$router.push('/')
-            }).catch(err => {
-              this.alert = {
-                active: true,
-                type: 'error',
-                msg: 'An error has occurred while logging in.'
-              }
-              console.log(err)
-            })
+            this.$store.dispatch('setLogin', res.data);
           }).catch(err => {
+            this.forms.loginForm.email = ""
             this.forms.loginForm.password = ""
             this.alert = {
               active: true,
               type: 'error',
-              msg: 'Email or Password invalid.'
+              msg: err.response.data.message
             }
             console.log(err)
           })
@@ -235,11 +221,21 @@
       userRegister () {
         this.$refs.registerForm.validate();
         if (this.forms.registerForm.isValid) {
-          this.alert = {
-            active: true,
-            type: 'success',
-            msg: "Pass"
+          let data = {
+            name: this.forms.registerForm.name,
+            email: this.forms.registerForm.email,
+            password: this.forms.registerForm.password
           }
+          service.register(data).then(res => {
+            this.$store.dispatch('setLogin', res.data);
+          }).catch(err => {
+            this.alert = {
+              active: true,
+              type: 'error',
+              msg: err.response.data.message
+            }
+            console.log(err)
+          })
         } else {
           this.alert = {
             active: true,
@@ -294,7 +290,6 @@
     width: 325px;
     margin-left: 50px;
     padding-bottom: 50px;
-
     height: 450px;
   }
 </style>
