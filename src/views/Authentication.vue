@@ -28,13 +28,15 @@
                                   :append-icon="forms.showPassword ? 'mdi-eye' : 'mdi-eye-off'"
                                   @click:append="forms.showPassword = !forms.showPassword"/>
                     <v-row class="mt-2">
-                      <v-col>
+                      <v-col class="text-center">
                         <v-btn class="mr-4 primary"
+                               width="125"
                                @click="userLogin"
                                v-on:keyup.enter="userLogin">
                           Let's go!
                         </v-btn>
                         <v-btn class="error--text"
+                               width="125"
                                @click="resetForm('loginForm')">
                           Clear
                         </v-btn>
@@ -46,7 +48,6 @@
                         <v-btn text width="100%"
                                @click="switchTab('registerForm')">
                           Create account
-                          <v-icon class="ml-2">mdi-chevron-right</v-icon>
                         </v-btn>
                       </v-col>
                     </v-row>
@@ -92,10 +93,12 @@
                     <v-row class="mt-2">
                       <v-col class="text-right">
                         <v-btn class="mr-4 success"
+                               width="100"
                                @click="userRegister">
                           Sign Up
                         </v-btn>
                         <v-btn class="error--text"
+                               width="100"
                                @click="resetForm('registerForm')">
                           Clear
                         </v-btn>
